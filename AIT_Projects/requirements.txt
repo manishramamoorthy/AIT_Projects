@@ -1,0 +1,11 @@
+pandas
+fastapi
+spacy
+numpy
+transformers
+torch
+uvicorn
+nltk
+scikit-learn
+black
+python-dotenv

@@ -1,0 +1,72 @@
+[
+    {
+        "id": 1,
+        "original_text_anonymized": "ANON HR rat document 7/10 2025-08-22T14:00:00Z",
+        "embedding_size": 768,
+        "refined_output": {
+            "action": "good",
+            "reward": 7.0,
+            "Q_values": {
+                "good": 0.7000000000000001,
+                "bad": 0
+            }
+        },
+        "asset_id": "asset_001"
+    },
+    {
+        "id": 2,
+        "original_text_anonymized": "ANON ANON love report . ANON : 9/10",
+        "embedding_size": 768,
+        "refined_output": {
+            "action": "bad",
+            "reward": 9.0,
+            "Q_values": {
+                "good": 0.7000000000000001,
+                "bad": 0.9
+            }
+        },
+        "asset_id": "asset_002"
+    },
+    {
+        "id": 3,
+        "original_text_anonymized": "guide ANON confusing . rating .",
+        "embedding_size": 768,
+        "refined_output": {
+            "action": "good",
+            "reward": 8.5,
+            "Q_values": {
+                "good": 1.48,
+                "bad": 0.9
+            }
+        },
+        "asset_id": "asset_003"
+    },
+    {
+        "id": 4,
+        "original_text_anonymized": "ANON project update . ANON : 8/10",
+        "embedding_size": 768,
+        "refined_output": {
+            "action": "bad",
+            "reward": 8.0,
+            "Q_values": {
+                "good": 1.48,
+                "bad": 1.6099999999999999
+            }
+        },
+        "asset_id": "asset_004"
+    },
+    {
+        "id": 5,
+        "original_text_anonymized": "ANON ANON error-free . ANON : 10/10",
+        "embedding_size": 768,
+        "refined_output": {
+            "action": "bad",
+            "reward": 10.0,
+            "Q_values": {
+                "good": 1.48,
+                "bad": 2.449
+            }
+        },
+        "asset_id": "asset_005"
+    }
+]

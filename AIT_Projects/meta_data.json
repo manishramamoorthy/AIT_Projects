@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "text": "John HR rat document 7/10 2025-08-22T14:00:00Z",
+        "names": [
+            "John"
+        ],
+        "rating": 7.0
+    },
+    {
+        "id": 2,
+        "text": "Sarah Marketing love report . Rating : 9/10",
+        "names": [
+            "Sarah"
+        ],
+        "rating": 9.0
+    },
+    {
+        "id": 3,
+        "text": "guide Tom confusing . rating .",
+        "names": [
+            "Tom"
+        ],
+        "rating": 8.5
+    },
+    {
+        "id": 4,
+        "text": "Excellent project update . Rating : 8/10",
+        "names": [
+            "No Name"
+        ],
+        "rating": 8.0
+    },
+    {
+        "id": 5,
+        "text": "Content Jane error-free . Rating : 10/10",
+        "names": [
+            "No Name"
+        ],
+        "rating": 10.0
+    }
+]
