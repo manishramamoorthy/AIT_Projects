@@ -1,72 +1,82 @@
 [
     {
         "id": 1,
+        "input_id": 1,
         "original_text_anonymized": "ANON HR rat document 7/10 2025-08-22T14:00:00Z",
         "embedding_size": 768,
         "refined_output": {
-            "action": "bad",
+            "action": "good",
             "reward": 7.0,
             "Q_values": {
-                "good": 0,
-                "bad": 0.7000000000000001
+                "good": 1.6,
+                "bad": 0
             }
         },
+        "timestamp": "2025-09-07T18:03:02.266248Z",
         "asset_id": "asset_001"
     },
     {
         "id": 2,
+        "input_id": 2,
         "original_text_anonymized": "ANON ANON love report . ANON : 9/10",
         "embedding_size": 768,
         "refined_output": {
             "action": "good",
             "reward": 9.0,
             "Q_values": {
-                "good": 0.9,
-                "bad": 0.7000000000000001
+                "good": 2.3400000000000003,
+                "bad": 0
             }
         },
+        "timestamp": "2025-09-07T18:03:02.309821Z",
         "asset_id": "asset_002"
     },
     {
         "id": 3,
+        "input_id": 3,
         "original_text_anonymized": "guide ANON confusing . rating .",
         "embedding_size": 768,
         "refined_output": {
-            "action": "bad",
+            "action": "good",
             "reward": 8.5,
             "Q_values": {
-                "good": 0.9,
-                "bad": 1.48
+                "good": 2.9560000000000004,
+                "bad": 0
             }
         },
+        "timestamp": "2025-09-07T18:03:02.354870Z",
         "asset_id": "asset_003"
     },
     {
         "id": 4,
+        "input_id": 4,
         "original_text_anonymized": "ANON project update . ANON : 8/10",
         "embedding_size": 768,
         "refined_output": {
             "action": "good",
             "reward": 8.0,
             "Q_values": {
-                "good": 1.6099999999999999,
-                "bad": 1.48
+                "good": 3.4604000000000004,
+                "bad": 0
             }
         },
+        "timestamp": "2025-09-07T18:03:02.411995Z",
         "asset_id": "asset_004"
     },
     {
         "id": 5,
+        "input_id": 5,
         "original_text_anonymized": "ANON ANON error-free . ANON : 10/10",
         "embedding_size": 768,
         "refined_output": {
             "action": "good",
             "reward": 10.0,
             "Q_values": {
-                "good": 2.449,
-                "bad": 1.48
+                "good": 4.1143600000000005,
+                "bad": 0
             }
         },
+        "timestamp": "2025-09-07T18:03:02.455037Z",
         "asset_id": "asset_005"
     }
 ]

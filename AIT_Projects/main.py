@@ -1,144 +1,151 @@
-# Import Libraries
+
+import os
+import time
+import logging
+from typing import List, Optional, Dict
+
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from typing import List, Optional, Dict
-import json
-import time
-import os
 
 from data_preprocessing import DataProcessing
 from metadata_extraction import MetaDataExtraction
 from ai_refinement import AIPipeline
 from asset_management import AssetManagement
-from data_persistence import DataPersistence
+from data_persistence import DataPersistence   # ✅ NEW
 
 load_dotenv()
-# Initialize a APP
-app = FastAPI(title="Data Optimization & Management Microservice")
 
-# Initialize a config :
-API_KEY = os.getenv('API_KEY')
-API_KEY_NAME = os.getenv('API_KEY_NAME')
+# Configure app + logging
+app = FastAPI(title="Data Optimization & Management Microservice")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+# API key config
+API_KEY = os.getenv("API_KEY")
+API_KEY_NAME = os.getenv("API_KEY_NAME", "x-api-key")
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
-RATE_LIMIT = 5  # max requests per IP
-TIME_WINDOW = 60  # seconds
-request_log: Dict[str, list] = {}  # track requests per client
-RESULTS_DIR = "."  # folder where result files are stored
+# Rate limiting config
+RATE_LIMIT = 5
+TIME_WINDOW = 60
+request_log: Dict[str, list] = {}
 
 
-# Authentication Process : verify the API key provided in the request header
 def get_api_key(api_key: str = Depends(api_key_header)):
-    """Check if the provided API key is valid; raise 403 error if not."""
-    if api_key != API_KEY:
+    try:
+        if api_key != API_KEY:
+            raise HTTPException(status_code=403, detail="Forbidden: Invalid API key")
+        return api_key
+    except Exception:
         raise HTTPException(status_code=403, detail="Forbidden: Invalid API key")
-    return api_key
 
 
-# Rate Limit Process : limit the number of requests per client IP within a time window
 def rate_limiter(request: Request):
-    """Check request frequency for the client IP and block if the rate limit is exceeded."""
     client_ip = request.client.host
     now = time.time()
 
     if client_ip not in request_log:
         request_log[client_ip] = []
-    request_log[client_ip] = [
-        t for t in request_log[client_ip] if now - t < TIME_WINDOW
-    ]
+    request_log[client_ip] = [t for t in request_log[client_ip] if now - t < TIME_WINDOW]
 
     if len(request_log[client_ip]) >= RATE_LIMIT:
-        raise HTTPException(
-            status_code=429, detail="Too Many Requests. Try again later."
-        )
+        raise HTTPException(status_code=429, detail="Too Many Requests. Try again later.")
 
     request_log[client_ip].append(now)
 
 
-# Pyndatic Model
 class Review(BaseModel):
     rating: Optional[float] = None
-    timestamp: Optional[str] = None  # ISO 8601 string
+    timestamp: Optional[str] = None
     text: Optional[str] = None
 
 
-# Endpoint :  Run the full data optimization pipeline
 @app.post("/optimize")
-def process_pipeline(reviews: List[Review]):
-    """Process a list of reviews through preprocessing, metadata extraction, AI refinement,
-       asset management, and data persistence, then return the results and log info."""
+def process_pipeline(
+    reviews: List[Review],
+    api_key: str = Depends(get_api_key),
+    _: None = Depends(rate_limiter),
+):
+    """
+    Runs the pipeline:
+    1. DataPreprocessing
+    2. MetadataExtraction
+    3. AI Refinement
+    4. AssetManagement
+    5. DataPersistence
+    """
     if not reviews:
         raise HTTPException(status_code=400, detail="No data provided")
 
-    # Step 1: Data Preprocessing
-    data_list = [review.dict() for review in reviews]
-    processor = DataProcessing(data_list)
-    processor.missing_values()
-    processor.remove_stopwords_and_lemmatize()
-    processor.save_to_json("cleaned_data.json")
-
-    # Step 2: Metadata Extraction
-    extractor = MetaDataExtraction(
-        input_file="cleaned_data.json", output_file="meta_data.json"
-    )
-    extractor.load_json_file()
-    extractor.process_data()
-    extractor.save_to_json()
-
-    # Step 3: AI Refinement (with logging)
-    pipeline = AIPipeline(
-        input_file="meta_data.json",
-        output_file="results.json",
-        log_file="pipeline.log",  # NEW: Log file
-    )
-    results = pipeline.process_file()
-
-    # Step 4: Asset Management
-    asset_manager = AssetManagement(
-        input_file="results.json", output_file="assets.json"
-    )
-    asset_manager.load_results()
-    asset_manager.process_assets()
-    final_output_file = asset_manager.save_to_json()
-
-    # Load final results (with asset_id)
-    with open(final_output_file, "r") as f:
-        final_results = json.load(f)
-
-    # Step 5: Data Persistence (Simulated Azure Blob)
-    persistence = DataPersistence()
-    persisted_file = persistence.save_to_blob(final_results)
-
-    return {
-        "message": "Full pipeline executed: Preprocessing → Metadata → AI Refinement → Asset Management",
-        "records_processed": len(final_results),
-        "final_output_file": final_output_file,
-        "persisted_file": persisted_file,
-        "log_file": "pipeline.log",  # NEW: Return log file path
-        "results": final_results,  # return all processed records
-    }
-
-
-# Retrieve Endpoint : fetch processed data from the pipeline
-@app.api_route("/retrieve", methods=["GET", "POST"])
-def retrieve_data(api_key: str = Depends(get_api_key), request: Request = None):
-    """Return all processed records from assets.json, enforcing API key and rate limiting."""
-    rate_limiter(request)
-
     try:
-        with open("assets.json", "r") as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        raise HTTPException(
-            status_code=404, detail="No processed data found. Run /optimize first."
-        )
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail="Error reading processed data.")
+        # STEP 1: Data Preprocessing
+        try:
+            data_list = [r.dict() for r in reviews]
+            processor = DataProcessing(data_list)
+            processor.missing_values()
+            processor.remove_stopwords_and_lemmatize()
+            cleaned_file = processor.save_to_json()
+            if not cleaned_file:
+                raise RuntimeError("DataProcessing.save_to_json returned None/empty")
+        except Exception as e:
+            logging.exception("Data preprocessing failed")
+            raise HTTPException(status_code=500, detail=f"Data preprocessing failed: {e}")
 
-    return {
-        "message": "Data retrieved successfully",
-        "records": len(data),
-        "data": data,
-    }
+        # STEP 2: Metadata Extraction
+        try:
+            extractor = MetaDataExtraction(input_dir="output/cleaned", output_dir="output/metadata_extraction")
+            metadata_output = extractor.run()
+            metadata_file = extractor.output_file
+            if not metadata_output or not metadata_file:
+                raise RuntimeError("Metadata extraction produced no output")
+        except Exception as e:
+            logging.exception("Metadata extraction failed")
+            raise HTTPException(status_code=500, detail=f"Metadata extraction failed: {e}")
+
+        # STEP 3: AI Refinement
+        try:
+            ai_pipeline = AIPipeline(input_file=metadata_file, output_dir="output/ai_refinement")
+            ai_output_file = ai_pipeline.run()
+            if not ai_output_file:
+                raise RuntimeError("AI refinement failed or produced no output")
+        except Exception as e:
+            logging.exception("AI refinement failed")
+            raise HTTPException(status_code=500, detail=f"AI refinement failed: {e}")
+
+        # STEP 4: Asset Management
+        try:
+            asset_manager = AssetManagement(input_dir="output/ai_refinement", output_dir="output/asset_management")
+            asset_output_file = asset_manager.run()
+            if not asset_output_file:
+                raise RuntimeError("Asset management failed or produced no output")
+        except Exception as e:
+            logging.exception("Asset management failed")
+            raise HTTPException(status_code=500, detail=f"Asset management failed: {e}")
+
+        # STEP 5: Data Persistence
+        try:
+            persistence = DataPersistence(input_dir="output/asset_management", container="mock_blob_storage")
+            blob_file = persistence.run()
+            if not blob_file:
+                raise RuntimeError("Data persistence failed or produced no output")
+        except Exception as e:
+            logging.exception("Data persistence failed")
+            raise HTTPException(status_code=500, detail=f"Data persistence failed: {e}")
+
+        # Final response
+        return {
+            "message": "Pipeline completed successfully",
+            "cleaned_file": cleaned_file,
+            "metadata_file": metadata_file,
+            "ai_refinement_file": ai_output_file,
+            "asset_management_file": asset_output_file,
+            "persisted_file": blob_file,
+            "records": len(data_list),
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.exception("Unexpected pipeline error")
+        raise HTTPException(status_code=500, detail=f"Processing failed: {str(e)}")

@@ -5,6 +5,12 @@
         "names": [
             "John"
         ],
+        "occupations": [
+            "HR"
+        ],
+        "locations": [
+            "No Location"
+        ],
         "rating": 7.0
     },
     {
@@ -12,6 +18,12 @@
         "text": "Sarah Marketing love report . Rating : 9/10",
         "names": [
             "Sarah"
+        ],
+        "occupations": [
+            "Marketing"
+        ],
+        "locations": [
+            "No Location"
         ],
         "rating": 9.0
     },
@@ -21,6 +33,12 @@
         "names": [
             "Tom"
         ],
+        "occupations": [
+            "Unknown Occupation"
+        ],
+        "locations": [
+            "No Location"
+        ],
         "rating": 8.5
     },
     {
@@ -29,6 +47,12 @@
         "names": [
             "No Name"
         ],
+        "occupations": [
+            "Unknown Occupation"
+        ],
+        "locations": [
+            "No Location"
+        ],
         "rating": 8.0
     },
     {
@@ -36,6 +60,12 @@
         "text": "Content Jane error-free . Rating : 10/10",
         "names": [
             "No Name"
+        ],
+        "occupations": [
+            "Unknown Occupation"
+        ],
+        "locations": [
+            "No Location"
         ],
         "rating": 10.0
     }
